@@ -193,17 +193,32 @@ module data_mem (
     input  [31:0] write_data,
     output reg [31:0] read_data
 );
+    // Memória com 64 posições de 32 bits 
     reg [31:0] mem [0:63];
+    integer i;
+
+    initial begin
+        // Inicializa toda a memória com zero para evitar valores 'x' 
+        for (i = 0; i < 64; i = i + 1) begin
+            mem[i] = 32'b0;
+        end
+        mem[0] = 32'd50; 
+        mem[1] = 32'd20; 
+    end
+
     always @(posedge clk) begin
         if (mem_write)
-            mem[addr >> 2] <= write_data;
+            mem[addr >> 2] <= write_data; 
     end
+
+    // Leitura na memória: combinacional [cite: 81]
     always @(*) begin
         if (mem_read)
             read_data = mem[addr >> 2];
         else
             read_data = 32'b0;
     end
+
 endmodule
 
 // =====================================================================================================
