@@ -1,4 +1,4 @@
-# TP1_OC
+# TP2_OC
 
 --------------código para rodar os códigos-------------
 iverilog -g2012 -o processador.out TP2.v TP2_TB.v
