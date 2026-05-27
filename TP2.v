@@ -193,25 +193,36 @@ module data_mem (
     input  [31:0] write_data,
     output reg [31:0] read_data
 );
-    // Memória com 64 posições de 32 bits 
+    // Declaração da memória com 64 posições de 32 bits 
     reg [31:0] mem [0:63];
-    integer i;
+    integer i, file, status;
 
     initial begin
-        // Inicializa toda a memória com zero para evitar valores 'x' 
+        // 1. Inicializa a memória com zero para evitar valores 'x' 
         for (i = 0; i < 64; i = i + 1) begin
             mem[i] = 32'b0;
         end
-        mem[0] = 32'd50; 
-        mem[1] = 32'd20; 
+
+        // 2. ALTERAÇÃO PARA DECIMAL: Abre o arquivo para leitura [cite: 40]
+        file = $fopen("valores_mem.txt", "r");
+        if (file != 0) begin
+            for (i = 0; i < 64; i = i + 1) begin
+                if (!$feof(file)) begin
+                    // %d permite que você escreva "1", "2", "10", etc., no arquivo txt
+                    status = $fscanf(file, "%d\n", mem[i]);
+                end
+            end
+            $fclose(file);
+        end
     end
 
+    // Escrita síncrona na memória [cite: 80]
     always @(posedge clk) begin
         if (mem_write)
-            mem[addr >> 2] <= write_data; 
+            mem[addr >> 2] <= write_data;
     end
 
-    // Leitura na memória: combinacional [cite: 81]
+    // Leitura combinacional da memória [cite: 81]
     always @(*) begin
         if (mem_read)
             read_data = mem[addr >> 2];
